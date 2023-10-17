@@ -120,12 +120,20 @@ class RecentFilesListView extends ItemView {
     const rootEl = createDiv({ cls: 'nav-folder mod-root' });
     const childrenEl = rootEl.createDiv({ cls: 'nav-folder-children' });
 
+    // Search Bar
+    //const searchRow = childrenEl.createDiv({ cls: 'search-row' });
+    //const searchContainer = searchRow.createDiv({ cls: 'search-input-container global-search-input-container' })
+    //const searchInput = searchContainer.createEl("input")
+    //const searchClear = searchContainer.createDiv({ cls: 'search-input-clear-button' })
+
     this.data.recentFiles.forEach((currentFile) => {
       const navFile = childrenEl.createDiv({ cls: 'tree-item nav-file recent-files-file' });
       const navFileTitle = navFile.createDiv({ cls: 'tree-item-self is-clickable nav-file-title recent-files-title' })
       const navFileTitleContent = navFileTitle.createDiv({ cls: 'tree-item-inner nav-file-title-content recent-files-title-content' })
 
-      navFileTitleContent.setText(currentFile.basename)
+      navFileTitleContent.setText(
+        currentFile.basename.replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} - /, '')
+      );
 
       if (openFile && currentFile.path === openFile.path) {
         navFileTitle.addClass('is-active');
@@ -182,11 +190,7 @@ class RecentFilesListView extends ItemView {
     });
 
     recentFiles.sort(sortFunc);
-    recentFiles = recentFiles.slice(0, this.data.maxLength || defaultMaxLength);
-    recentFiles.forEach((file) => {
-      file.basename = file.basename.replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} - /, '');
-    })
-    this.data.recentFiles = recentFiles
+    this.data.recentFiles = recentFiles.slice(0, this.data.maxLength || defaultMaxLength);
     await this.plugin.saveData();
   }
 
@@ -353,7 +357,6 @@ export default class RecentFilesPlugin extends Plugin {
     if (entry) {
       entry.path = file.path;
       entry.basename = this.trimExtension(file.name);
-      entry.basename = entry.basename.replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} - /, '');
       this.view.redraw();
       await this.saveData();
     }
