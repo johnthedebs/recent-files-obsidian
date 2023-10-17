@@ -166,7 +166,7 @@ class RecentFilesListView extends ItemView {
         menu.showAtPosition({ x: event.clientX, y: event.clientY });
       });
 
-      navFileTitleContent.addEventListener('click', (event: MouseEvent) => {
+      navFileTitle.addEventListener('click', (event: MouseEvent) => {
         this.focusFile(currentFile, event.ctrlKey || event.metaKey);
       });
     });
@@ -202,9 +202,7 @@ class RecentFilesListView extends ItemView {
    * true.
    */
   private readonly focusFile = (file: RecentFileInfo, shouldSplit = false): void => {
-    const targetFile = this.app.vault
-      .getFiles()
-      .find((f) => f.path === file.path);
+    const targetFile = this.app.vault.getAbstractFileByPath(file.path);
 
     if (targetFile) {
       let leaf = this.app.workspace.getMostRecentLeaf();
