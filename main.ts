@@ -182,12 +182,18 @@ class RecentFilesListView extends ItemView {
     });
 
     recentFiles.sort(sortFunc);
-    this.data.recentFiles = recentFiles.slice(0, this.data.maxLength || defaultMaxLength);
+    recentFiles = recentFiles.slice(0, this.data.maxLength || defaultMaxLength);
+    recentFiles.forEach((file) => {
+      file.basename = file.basename.replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} - /, '');
+    })
+    this.data.recentFiles = recentFiles
     await this.plugin.saveData();
   }
 
   private readonly update = async (editor: Editor, info: MarkdownView | MarkdownFileInfo): Promise<void> => {
-    if (info && info.file && this.data.recentFiles[0] && info.file.path === this.data.recentFiles[0].path) {
+    if (
+      info?.file && this.data.recentFiles.length > 0 && info.file.path === this.data.recentFiles[0].path
+    ) {
       return
     }
     await this.updateData()
@@ -347,6 +353,7 @@ export default class RecentFilesPlugin extends Plugin {
     if (entry) {
       entry.path = file.path;
       entry.basename = this.trimExtension(file.name);
+      entry.basename = entry.basename.replace(/^\d{4}-\d{2}-\d{2} \d{2}\.\d{2} - /, '');
       this.view.redraw();
       await this.saveData();
     }
